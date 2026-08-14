@@ -2,6 +2,7 @@ from logging import root
 import tkinter as tk
 from tkinter import messagebox
 
+from UrbanVitalSigns import UrbanVitalSigns
 from specificationRules import SpecificationRules
 
 class VciCalculator:
@@ -55,7 +56,7 @@ class VciCalculator:
         # Dictionary to store references to each equation label
         self.eq_labels = {}
 
-        for i in range(1, 7):
+        for i in range(1, 16):
             lbl = tk.Label(
                 self.root, 
                 text=f"Equation {i}: --", 
@@ -151,6 +152,7 @@ class VciCalculator:
     
     def CalculateVCI(self):
         self.process = SpecificationRules(self.root)
+        self.urbanVitalSigns = UrbanVitalSigns(self.root)
         try:
             pm25_val = float(self.input_entries["PM2.5"].get())
             day_heat_val = float(self.input_entries["Daytime heat T"].get())
@@ -183,6 +185,9 @@ class VciCalculator:
             "Walkability": self.process.calculate_z_score(walkability_val, *anchors["Walkability"]),
             "NoiseNight":  self.process.calculate_z_score(night_noise_val, *anchors["NoiseNight"]),
         }
+        
+        nex_raw = self.urbanVitalSigns.calculate_nex(z_scores['NDVI'], other_z_values=[0.20]*6)
+        nte_raw = self.urbanVitalSigns.calculate_nte(z_noise=z_scores['NoiseNight'], z_nh=z_scores['f_NH'] )
                 
         self.AddEquationLabels()
         
@@ -191,6 +196,7 @@ class VciCalculator:
         self.eq_labels[3].config(text=f"Equation 3 (f_H):  {self.f_h:.2f}")
         self.eq_labels[4].config(text=f"Equation 4 (f_NH): {self.f_nh:.3f}")
 
+
         # Update Equation Label 1 for Step 3 Standardisation (Z-scores)
         z_text = (
             f"Equation 1 (Z-scores):\n"
@@ -198,5 +204,8 @@ class VciCalculator:
             f"  • Z_NDVI: {z_scores['NDVI']:+.2f} | Z_Walk: {z_scores['Walkability']:+.2f} | Z_Noise: {z_scores['NoiseNight']:+.2f}"
         )
 
-        # Update Equation 1 Label
         self.eq_labels[1].config(text=z_text, justify="left")
+
+        # Update Equation Label 7 and 9 for Step 4 NEX Calculation
+        self.eq_labels[7].config(text=f"Equation 7 (NEX):  {nex_raw:+.2f}")
+        self.eq_labels[9].config(text=f"Equation 9 (NTE):  {nte_raw:+.2f}")
