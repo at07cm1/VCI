@@ -4,6 +4,12 @@ class SpecificationRules:
     def __init__(self, root):     
         self.root = root
 
+    def calculate_z_score(self, val, mu, sigma):
+        # Equation 1
+        if sigma == 0:
+            raise ValueError("Standard deviation (sigma) cannot be zero.")
+        return (val - mu) / sigma
+
     def calculate_f_pm(self, x, x_ref):
         # Equation 2
         if x < 0:

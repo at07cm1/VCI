@@ -62,7 +62,7 @@ class VciCalculator:
                 font=("Arial", 10),
                 anchor="w"
             )
-            lbl.place(x=(self.xLeft + 800), y=(self.yTop + 80 + (i - 1) * 30))
+            lbl.place(x=(self.xLeft + 800), y=(self.yTop + 80 + (i - 1) * 40))
             
             # Save reference by equation number
             self.eq_labels[i] = lbl
@@ -162,12 +162,41 @@ class VciCalculator:
             tk.messagebox.showerror("Invalid Input", "Please fill in all input fields with valid numbers.")
 
         self.f_pm = self.process.calculate_f_pm(pm25_val, self.XREF)
-        self.f_h = self.process.calculate_f_h(day_heat_val, night_heat_val, self.ST)
+        self.f_h  = self.process.calculate_f_h(day_heat_val, night_heat_val, self.ST)
         self.f_nh = self.process.calculate_f_nh(night_heat_val, self.TTHR)
+
+        anchors = {
+            "f_PM":        (1.20, 0.30),
+            "f_H":         (1.50, 0.80),
+            "f_NH":        (1.00, 1.20),
+            "NDVI":        (0.40, 0.12),
+            "Walkability": (60.0, 15.0),
+            "NoiseNight":  (50.0, 6.0),
+        }
+
+        # 4. Step 3 Standardisation (Calculate Z-scores)
+        z_scores = {
+            "f_PM":        self.process.calculate_z_score(self.f_pm, *anchors["f_PM"]),
+            "f_H":         self.process.calculate_z_score(self.f_h, *anchors["f_H"]),
+            "f_NH":        self.process.calculate_z_score(self.f_nh, *anchors["f_NH"]),
+            "NDVI":        self.process.calculate_z_score(ndvi_val, *anchors["NDVI"]),
+            "Walkability": self.process.calculate_z_score(walkability_val, *anchors["Walkability"]),
+            "NoiseNight":  self.process.calculate_z_score(night_noise_val, *anchors["NoiseNight"]),
+        }
                 
         self.AddEquationLabels()
         
-        # Update Equation labels 2, 3, and 4
+        # Update Equation Labels 2, 3, and 4 for step 2
         self.eq_labels[2].config(text=f"Equation 2 (f_PM): {self.f_pm:.3f}")
         self.eq_labels[3].config(text=f"Equation 3 (f_H):  {self.f_h:.2f}")
         self.eq_labels[4].config(text=f"Equation 4 (f_NH): {self.f_nh:.3f}")
+
+        # Update Equation Label 1 for Step 3 Standardisation (Z-scores)
+        z_text = (
+            f"Equation 1 (Z-scores):\n"
+            f"  • Z_PM: {z_scores['f_PM']:+.2f} | Z_H: {z_scores['f_H']:+.3f} | Z_NH: {z_scores['f_NH']:+.2f}"
+            f"  • Z_NDVI: {z_scores['NDVI']:+.2f} | Z_Walk: {z_scores['Walkability']:+.2f} | Z_Noise: {z_scores['NoiseNight']:+.2f}"
+        )
+
+        # Update Equation 1 Label
+        self.eq_labels[1].config(text=z_text, justify="left")
