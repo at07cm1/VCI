@@ -2,8 +2,9 @@ from logging import root
 import tkinter as tk
 from tkinter import messagebox
 
+from IntegrationResilience import IntegrationResilience
 from UrbanVitalSigns import UrbanVitalSigns
-from specificationRules import SpecificationRules
+from SpecificationRules import SpecificationRules
 
 class VciCalculator:
     def __init__(self, root):
@@ -153,6 +154,7 @@ class VciCalculator:
     def CalculateVCI(self):
         self.process = SpecificationRules(self.root)
         self.urbanVitalSigns = UrbanVitalSigns(self.root)
+        self.IntegrationResilience = IntegrationResilience(self.root)
         try:
             pm25_val = float(self.input_entries["PM2.5"].get())
             day_heat_val = float(self.input_entries["Daytime heat T"].get())
@@ -198,13 +200,31 @@ class VciCalculator:
         nex_norm_raw = self.process.normalize_vital_sign(nex_oriented, alpha=-2.0, beta=2.0)
         nte_norm_raw = self.process.normalize_vital_sign(nte_oriented, alpha=-2.0, beta=2.0)
 
+        # Step 6
+        normalized_domains = {
+            "NEX": nex_norm_raw,   # 0.56 (from Step 5)
+            "SEV": 0.60,        # Illustrative fixed value
+            "NTE": nte_norm_raw,   # 0.31 (from Step 5)
+            "CMX": 0.38,        # Illustrative fixed value
+            "CEV": 0.52,        # Illustrative fixed value
+            "SRB": 0.49,        # Illustrative fixed value
+        }
+
+        #Calculate VCI (Raw and Centered)
+        vci_raw, vci_centered_raw = self.IntegrationResilience.calculate_vci(
+            normalized_domains=normalized_domains,
+            alpha_k=1/6,
+            gamma=0.10,
+            interaction_sum=1.35,
+            centering_const=0.50
+        )
+
         self.AddEquationLabels()
         
         # Update Equation Labels 2, 3, and 4 for step 2
         self.eq_labels[2].config(text=f"Equation 2 (f_PM): {self.f_pm:.3f}")
         self.eq_labels[3].config(text=f"Equation 3 (f_H):  {self.f_h:.2f}")
         self.eq_labels[4].config(text=f"Equation 4 (f_NH): {self.f_nh:.3f}")
-
 
         # Update Equation Label 1 for Step 3 Standardisation (Z-scores)
         z_text = (
@@ -219,6 +239,9 @@ class VciCalculator:
         self.eq_labels[7].config(text=f"Equation 7 (NEX):  {nex_raw:+.2f}")
         self.eq_labels[9].config(text=f"Equation 9 (NTE):  {nte_raw:+.2f}")
 
-        # Update Equation Labels 5 and 6 for Step 5 VCI Calculation
+        # Update Equation Labels 5 and 6 for Step 5 Orient and scale
         self.eq_labels[5].config(text=f"Eq 5 (NEX~): {nex_norm_raw:.2f}")
         self.eq_labels[6].config(text=f"Eq 6 (NTE~): {nte_norm_raw:.2f}")
+
+        # Update Equation Labels 13 for Step 6 Integration
+        self.eq_labels[13].config(text=f"Equation 13 (VCI_raw): {vci_raw:.3f} | VCI_centered: {vci_centered_raw:.3f}")
