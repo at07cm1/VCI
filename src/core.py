@@ -219,6 +219,12 @@ class VciCalculator:
             centering_const=0.50
         )
 
+        # Step 7: Calculate UPRI
+        sum_p = 2.10
+        sum_h = 2.55
+
+        upri_raw = self.IntegrationResilience.calculate_upri(sum_protective=sum_p, sum_stressors=sum_h)
+
         self.AddEquationLabels()
         
         # Update Equation Labels 2, 3, and 4 for step 2
@@ -245,3 +251,6 @@ class VciCalculator:
 
         # Update Equation Labels 13 for Step 6 Integration
         self.eq_labels[13].config(text=f"Equation 13 (VCI_raw): {vci_raw:.3f} | VCI_centered: {vci_centered_raw:.3f}")
+
+        # Update Equation Labels 15 for Step 7 UPRI Calculation
+        self.eq_labels[15].config(text=f"Eq 15 (UPRI): {upri_raw:.2f}")

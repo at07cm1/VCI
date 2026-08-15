@@ -25,3 +25,10 @@ class IntegrationResilience:
         vci_centered = (vci_raw - centering_const) * 2.0
         
         return vci_raw, vci_centered
+
+    def calculate_upri(self, sum_protective=2.10, sum_stressors=2.55):
+        # Equation 15
+        if sum_stressors == 0:
+            raise ValueError("Stressor sum cannot be zero.")
+            
+        return sum_protective / abs(sum_stressors)
