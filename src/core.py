@@ -188,7 +188,16 @@ class VciCalculator:
         
         nex_raw = self.urbanVitalSigns.calculate_nex(z_scores['NDVI'], other_z_values=[0.20]*6)
         nte_raw = self.urbanVitalSigns.calculate_nte(z_noise=z_scores['NoiseNight'], z_nh=z_scores['f_NH'] )
-                
+
+        # Step 5
+        # Sign Orientation
+        nex_oriented = self.process.apply_orientation(nex_raw, is_cmx=False)
+        nte_oriented = self.process.apply_orientation(nte_raw, is_cmx=False)
+
+        #Normalization on [0, 1] using fixed bounds (alpha = -2, beta = +2)
+        nex_norm_raw = self.process.normalize_vital_sign(nex_oriented, alpha=-2.0, beta=2.0)
+        nte_norm_raw = self.process.normalize_vital_sign(nte_oriented, alpha=-2.0, beta=2.0)
+
         self.AddEquationLabels()
         
         # Update Equation Labels 2, 3, and 4 for step 2
@@ -206,6 +215,10 @@ class VciCalculator:
 
         self.eq_labels[1].config(text=z_text, justify="left")
 
-        # Update Equation Label 7 and 9 for Step 4 NEX Calculation
+        # Update Equation Labels 7 and 9 for Step 4 NEX Calculation
         self.eq_labels[7].config(text=f"Equation 7 (NEX):  {nex_raw:+.2f}")
         self.eq_labels[9].config(text=f"Equation 9 (NTE):  {nte_raw:+.2f}")
+
+        # Update Equation Labels 5 and 6 for Step 5 VCI Calculation
+        self.eq_labels[5].config(text=f"Eq 5 (NEX~): {nex_norm_raw:.2f}")
+        self.eq_labels[6].config(text=f"Eq 6 (NTE~): {nte_norm_raw:.2f}")

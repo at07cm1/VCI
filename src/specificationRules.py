@@ -33,3 +33,18 @@ class SpecificationRules:
         diff = max(0.0, T - T_thr)
         
         return diff ** 1.5
+
+    def apply_orientation(self, value, is_cmx=False):
+        # Equation 5
+        s_k = -1.0 if is_cmx else 1.0
+        return s_k * value
+
+    def normalize_vital_sign(self, v_oriented, alpha=-2.0, beta=2.0):
+        # Equation 6
+        if beta == alpha:
+            raise ValueError("Upper bound (beta) and lower bound (alpha) cannot be equal.")
+            
+        normalized = (v_oriented - alpha) / (beta - alpha)
+        
+        # Clamp bounds strictly within [0, 1] interval
+        return max(0.0, min(1.0, normalized))
