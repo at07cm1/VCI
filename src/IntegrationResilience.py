@@ -3,7 +3,7 @@ class IntegrationResilience:
     def __init__(self, root):     
             self.root = root
 
-    def calculate_vci(
+    def CalculateVci(
         self, 
         normalized_domains, 
         alpha_k=1/6, 
@@ -26,7 +26,7 @@ class IntegrationResilience:
         
         return vci_raw, vci_centered
 
-    def calculate_upri(self, sum_protective=2.10, sum_stressors=2.55):
+    def CalculateUpri(self, sum_protective=2.10, sum_stressors=2.55):
         # Equation 15
         if sum_stressors == 0:
             raise ValueError("Stressor sum cannot be zero.")
