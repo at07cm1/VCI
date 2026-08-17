@@ -13,6 +13,7 @@ class GenerateUI:
         self.XREF = 5.0      # μg m⁻³
         self.ST = 5.0        # °C
         self.TTHR = 24.0     # °C
+        self.TMMT = 26       # °C
 
         # Calculate Button
         self.calc_btn = tk.Button(root, text="Calculate VCI", command=lambda: self.OnCalculateClicked(), 
@@ -52,6 +53,7 @@ class GenerateUI:
             ("X_ref", f"{self.XREF}", "μg m⁻³"),
             ("S_t", f"{self.ST}", "°C"),
             ("T_thr", f"{self.TTHR}", "°C"),
+            ("Daytime T_MMT",  f"{self.TMMT}", "°C")
         ]
 
         row_height = 25
@@ -72,42 +74,47 @@ class GenerateUI:
     def AddInputFields(self):
         vcmd = (self.root.register(self.ValidateFloat), '%P')
         # Field definitions: (Field Name, Default Value, Units / Details)
-        raw_inputs = [
-            ("PM2.5", "10.0", "μg m⁻³"),
-            ("Daytime heat T", "33", "°C (city T_MMT = 26, s_T = 5)"),
-            ("Nighttime heat T", "26", "°C (T_thr = 24)"),
-            ("NDVI", "0.45", ""),
-            ("Walkability", "78", "(0–100)"),
-            ("Night noise", "55", "dB(A)"),
-        ]
+        self.input_config = {
+            "PM2.5"      : ("PM2.5 (μg m⁻³)", "10.0"),
+            "T_day"      : ("Daytime heat T (°C)", "33.0"),
+            "T_night"    : ("Nighttime heat T (°C)", "26.0"),
+            "NDVI"       : ("NDVI (Landscape vegetation)", "0.45"),
+            "GVI"        : ("GVI (Street-level greenery)", "0.30"),
+            "AccessGreen": ("Green-space access", "0.60"),
+            "Canopy"     : ("Tree canopy", "0.25"),
+            "Blue"       : ("Blue-space proximity", "0.20"),
+            "Micro"      : ("Restorative micro-space", "0.40"),
+            "Sidewalk"   : ("Sidewalk contiguity", "0.70"),
+            "Walkability": ("Walkability (0–100)", "78.0"),
+            "NoiseNight" : ("Night noise dB(A)", "55.0"),
+            "Daylight"   : ("Daytime light Z", "0.30"),
+            "LightNight" : ("Night light Z", "0.60"),
+            "HumidNight" : ("Night humidity Z", "0.40"),
+        }
 
         start_y = self.yTop + 70
         row_height = 30
 
-        for i, (label_name, default_val, unit) in enumerate(raw_inputs):
-            current_y = start_y + (i * row_height)
-
-            # 1. Input Name Label
-            lbl = tk.Label(self.root, text=label_name, font=("Arial", 9), anchor="w")
-            lbl.place(x=self.xLeft + 400, y=current_y, width=130)
-
-            # 2. Text Entry Box
+        for i, (key, (label_text, default_val)) in enumerate(self.input_config.items()):
+            current_y = start_y + 30 + (i * row_height)
+            
+            # Label
+            lbl = tk.Label(self.root, text=label_text, font=("Arial", 9), anchor="w")
+            lbl.place(x=self.xLeft + 400, y=current_y, width=180)
+            
+            # Entry
             entry = tk.Entry(
                 self.root, 
                 font=("Arial", 9),
-                validate="key",            # Trigger validation on keypress
-                validatecommand=vcmd       # Call our validation function
+                validate="key",        # Trigger validation on keypress
+                validatecommand = vcmd # Call our validation function
             )
-            entry.insert(0, default_val)
-            entry.place(x=self.xLeft + 535, y=current_y, width=70)
-            
-            self.input_entries[label_name] = entry
 
-            # 3. Unit / Context Label
-            if unit:
-                unit_lbl = tk.Label(self.root, text=unit, font=("Arial", 9), fg="#555555", anchor="w")
-                unit_lbl.place(x=self.xLeft + 615, y=current_y)
-    
+            entry.insert(0, default_val)
+            entry.place(x=self.xLeft + 590, y=current_y, width=70)
+            
+            self.input_entries[key] = entry
+
     def ValidateFloat(self, P):
         if P == "" or P == "-":
             return True

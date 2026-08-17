@@ -20,12 +20,21 @@ class VciCalculator:
         self.urbanVitalSigns = UrbanVitalSigns(self.root)
         self.IntegrationResilience = IntegrationResilience(self.root)
         try:
-            pm25_val        = float(self.generateUI.input_entries["PM2.5"].get())
-            day_heat_val    = float(self.generateUI.input_entries["Daytime heat T"].get())
-            night_heat_val  = float(self.generateUI.input_entries["Nighttime heat T"].get())
-            ndvi_val        = float(self.generateUI.input_entries["NDVI"].get())
-            walkability_val = float(self.generateUI.input_entries["Walkability"].get())
-            night_noise_val = float(self.generateUI.input_entries["Night noise"].get())
+            inputs = {key: float(entry.get()) for key, entry in self.generateUI.input_entries.items()}
+
+            pm25_val        = inputs["PM2.5"]
+            day_heat_val    = inputs["T_day"]
+            night_heat_val  = inputs["T_night"]
+            ndvi_val        = inputs["NDVI"]
+            gvi_val         = inputs["GVI"]
+            access_green    = inputs["AccessGreen"]
+            canopy_val      = inputs["Canopy"]
+            blue_val        = inputs["Blue"]
+            micro_val       = inputs["Micro"]
+            sidewalk_val    = inputs["Sidewalk"]
+            walkability_val = inputs["Walkability"]
+            night_noise_val = inputs["NoiseNight"]
+
         except ValueError:
             tk.messagebox.showerror("Invalid Input", "Please fill in all input fields with valid numbers.")
 
