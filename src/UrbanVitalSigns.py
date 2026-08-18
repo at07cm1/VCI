@@ -70,4 +70,25 @@ class UrbanVitalSigns:
         penalty = w10 * (((c - c_opt) / s_c) ** 2)
         
         return linear_part - penalty
-    
+
+    def calculate_srb(self, protective_list=None, adverse_list=None):
+        # Equation 12
+        if protective_list is None:
+            # Default illustrative protective values: greenness, walkability, social, dwell
+            protective_list = [0.42, 1.20, 0.40, 0.33]
+
+        if adverse_list is None:
+            # Default illustrative adverse values: PM2.5, noise, heat
+            adverse_list = [0.46, 0.83, 0.58]
+
+        sum_p = sum(protective_list)
+        sum_h = sum(adverse_list)
+        
+        sum_abs_p = sum(abs(p) for p in protective_list)
+        sum_abs_h = sum(abs(h) for h in adverse_list)
+
+        denominator = sum_abs_p + sum_abs_h
+        if denominator == 0:
+            return 0.0
+
+        return (sum_p - sum_h) / denominator
