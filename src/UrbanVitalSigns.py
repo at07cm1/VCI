@@ -42,4 +42,18 @@ class UrbanVitalSigns:
         
         return positive_part - negative_part
 
+    def CalculateCmx(
+        self, 
+        z_f_pm, 
+        z_f_h, 
+        z_noise=0.50, 
+        z_inactivity=0.30, 
+        z_commute=0.40, 
+        z_housing=0.60, 
+        beta=1/6
+    ):
+        # Equation 10
+        cmx_sum = z_f_pm + z_noise + z_f_h + z_inactivity + z_commute + z_housing
+        return beta * cmx_sum
+
     
