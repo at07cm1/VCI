@@ -15,6 +15,18 @@ class UrbanVitalSigns:
         
         return total_sum / 7.0
 
+    def CalculateSev(self, sev_z_values=None):
+        # Equation 8
+        if sev_z_values is None:
+            # Default illustrative Z-values matching Equation 8
+            sev_z_values = [0.30, 0.50, 0.40, 0.20, 0.60, 0.10, 0.70]
+
+        if len(sev_z_values) != 7:
+            raise ValueError("sev_z_values must contain exactly 7 Z-scores.")
+
+        # Equal weighting w_i = 1/7
+        return sum(sev_z_values) / 7.0
+    
     def CalculateNte(
         self, 
         z_noise, 
