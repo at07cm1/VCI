@@ -77,7 +77,8 @@ class VciCalculator:
         sev_raw = self.urbanVitalSigns.CalculateSev()
         nte_raw = self.urbanVitalSigns.CalculateNte(z_noise = z_scores['NoiseNight'], z_nh = z_scores['f_NH'] )
         cmx_raw = self.urbanVitalSigns.CalculateCmx(z_f_pm = z_scores['f_PM'], z_f_h = z_scores['f_H'])
-
+        cev_raw = self.urbanVitalSigns.CalculateCev(z_sum = 2.25)
+        
         # Step 5
         # Sign Orientation
         nex_oriented = self.process.ApplyOrientation(nex_raw, is_cmx=False)
@@ -134,8 +135,9 @@ class VciCalculator:
         self.generateUI.eq_labels[8].config(text=f"Equation 8 (SEV):  {sev_raw:+.3f}")
         self.generateUI.eq_labels[9].config(text=f"Equation 9 (NTE):  {nte_raw:+.3f}")
 
-        # Update Equation Label 10 for CMX Calculation
+        # Update Equation Labels 10, 11 for CMX and CEV Calculation
         self.generateUI.eq_labels[10].config(text=f"Equation 10 (CMX):  {cmx_raw:+.3f}")
+        self.generateUI.eq_labels[11].config(text=f"Equation 11 (CEV):  {cev_raw:+.3f}")
 
         # Update Equation Labels 5 and 6 for Step 5 Orient and scale
         self.generateUI.eq_labels[5].config(text=f"Eq 5 (NEX~): {nex_norm_raw:.2f}")

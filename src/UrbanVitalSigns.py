@@ -56,4 +56,18 @@ class UrbanVitalSigns:
         cmx_sum = z_f_pm + z_noise + z_f_h + z_inactivity + z_commute + z_housing
         return beta * cmx_sum
 
+    def CalculateCev(
+        self,
+        z_sum,
+        n_inputs=9,
+        c=0.72,
+        c_opt=0.55,
+        s_c=0.20,
+        w10=0.30
+    ):
+        # Equation 11
+        linear_part = z_sum / n_inputs
+        penalty = w10 * (((c - c_opt) / s_c) ** 2)
+        
+        return linear_part - penalty
     
