@@ -3,16 +3,16 @@ class UrbanVitalSigns:
     def __init__(self, root):     
         self.root = root
 
-    def CalculateNex(self, z_ndvi, other_z_values=None):
+    def CalculateNex(self, z_scores):
         # Equation 7
-        if other_z_values is None:
-            # Default remaining 6 inputs to +0.20 each
-            other_z_values = [0.20] * 6
-
-        if len(other_z_values) != 6:
-            raise ValueError("other_z_values must contain exactly 6 elements.")
-
-        total_sum = z_ndvi + sum(other_z_values)
+        nex_keys = [
+            "NDVI", "GVI", "AccessGreen", 
+            "Canopy", "Blue", "Micro", "Sidewalk"
+        ]
+        
+        # Sum the 7 NEX Z-scores
+        total_sum = sum(z_scores[key] for key in nex_keys)
+        
         return total_sum / 7.0
 
     def CalculateNte(

@@ -73,7 +73,7 @@ class VciCalculator:
             "NoiseNight":  self.process.Calculate_ZScore(night_noise_val, *anchors["NoiseNight"]),
         }
         
-        nex_raw = self.urbanVitalSigns.CalculateNex(z_scores['NDVI'], other_z_values=[0.20]*6)
+        nex_raw = self.urbanVitalSigns.CalculateNex(z_scores)
         nte_raw = self.urbanVitalSigns.CalculateNte(z_noise=z_scores['NoiseNight'], z_nh=z_scores['f_NH'] )
 
         # Step 5
@@ -128,7 +128,7 @@ class VciCalculator:
         self.generateUI.eq_labels[1].config(text=z_text, justify="left")
 
         # Update Equation Labels 7 and 9 for Step 4 NEX Calculation
-        self.generateUI.eq_labels[7].config(text=f"Equation 7 (NEX):  {nex_raw:+.2f}")
+        self.generateUI.eq_labels[7].config(text=f"Equation 7 (NEX):  {nex_raw:+.3f}")
         self.generateUI.eq_labels[9].config(text=f"Equation 9 (NTE):  {nte_raw:+.2f}")
 
         # Update Equation Labels 5 and 6 for Step 5 Orient and scale
