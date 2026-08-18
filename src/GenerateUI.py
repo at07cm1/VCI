@@ -142,15 +142,28 @@ class GenerateUI:
 
         # Dictionary to store references to each equation label
         self.eq_labels = {}
+        start_y = self.yTop + 80
 
-        for i in range(1, 16):
+        lbl = tk.Label(
+                        self.root, 
+                        text=f"Equation {1}: --", 
+                        font=("Arial", 10),
+                        anchor="w"
+                    )
+        lbl.place(x=(self.xLeft + 800), y=start_y)
+        start_y += 20
+        
+        # Save reference by equation number
+        self.eq_labels[1] = lbl
+        
+        for i in range(2, 16):
             lbl = tk.Label(
                 self.root, 
                 text=f"Equation {i}: --", 
                 font=("Arial", 10),
                 anchor="w"
             )
-            lbl.place(x=(self.xLeft + 800), y=(self.yTop + 80 + (i - 1) * 40))
+            lbl.place(x=(self.xLeft + 800), y=(start_y + (i - 1) * 40))
             
             # Save reference by equation number
             self.eq_labels[i] = lbl

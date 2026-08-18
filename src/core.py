@@ -47,8 +47,14 @@ class VciCalculator:
             "f_H":         (1.50, 0.80),
             "f_NH":        (1.00, 1.20),
             "NDVI":        (0.40, 0.12),
+            "GVI":         (0.28, 0.10),
+            "AccessGreen": (0.50, 0.20),
+            "Canopy":      (0.30, 0.12),
+            "Blue":        (0.25, 0.15),
+            "Micro":       (0.35, 0.15),
+            "Sidewalk":    (0.55, 0.18),
             "Walkability": (60.0, 15.0),
-            "NoiseNight":  (50.0, 6.0),
+            "NoiseNight":  (50.0, 6.0)
         }
 
         # 4. Step 3 Standardisation (Calculate Z-scores)
@@ -57,6 +63,12 @@ class VciCalculator:
             "f_H":         self.process.Calculate_ZScore(self.f_h, *anchors["f_H"]),
             "f_NH":        self.process.Calculate_ZScore(self.f_nh, *anchors["f_NH"]),
             "NDVI":        self.process.Calculate_ZScore(ndvi_val, *anchors["NDVI"]),
+            "GVI":         self.process.Calculate_ZScore(gvi_val, *anchors["GVI"]),
+            "AccessGreen": self.process.Calculate_ZScore(access_green, *anchors["AccessGreen"]),
+            "Canopy":      self.process.Calculate_ZScore(canopy_val, *anchors["Canopy"]),
+            "Blue":        self.process.Calculate_ZScore(blue_val, *anchors["Blue"]),
+            "Micro":       self.process.Calculate_ZScore(micro_val, *anchors["Micro"]),
+            "Sidewalk":    self.process.Calculate_ZScore(sidewalk_val, *anchors["Sidewalk"]),
             "Walkability": self.process.Calculate_ZScore(walkability_val, *anchors["Walkability"]),
             "NoiseNight":  self.process.Calculate_ZScore(night_noise_val, *anchors["NoiseNight"]),
         }
@@ -108,8 +120,9 @@ class VciCalculator:
         # Update Equation Label 1 for Step 3 Standardisation (Z-scores)
         z_text = (
             f"Equation 1 (Z-scores):\n"
-            f"  • Z_PM: {z_scores['f_PM']:+.2f} | Z_H: {z_scores['f_H']:+.3f} | Z_NH: {z_scores['f_NH']:+.2f}"
-            f"  • Z_NDVI: {z_scores['NDVI']:+.2f} | Z_Walk: {z_scores['Walkability']:+.2f} | Z_Noise: {z_scores['NoiseNight']:+.2f}"
+            f"  • Z_PM: {z_scores['f_PM']:+.2f} | Z_H: {z_scores['f_H']:+.2f} | Z_NH: {z_scores['f_NH']:+.2f}"
+            f"  • Z_NDVI: {z_scores['NDVI']:+.2f} | Z_GVI: {z_scores['GVI']:+.2f} | Z_AccessGreen: {z_scores['AccessGreen']:+.2f}\n"
+            f"  • Z_Canopy: {z_scores['Canopy']:+.2f} | • Z_Blue: {z_scores['Blue']:+.2f} | Z_Micro: {z_scores['Micro']:+.2f} | Z_Sidewalk: {z_scores['Sidewalk']:+.2f} | Z_Walk: {z_scores['Walkability']:+.2f} | Z_Noise: {z_scores['NoiseNight']:+.2f}"
         )
 
         self.generateUI.eq_labels[1].config(text=z_text, justify="left")
