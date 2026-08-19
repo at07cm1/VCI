@@ -6,30 +6,58 @@ class IntegrationResilience:
                 "NDVI": {"NEX": 0.40, "SRB": 0.30, "CEV": 0.30},
                 "f_PM": {"CMX": 0.50, "SRB": 0.50},
                 "NoiseNight": {"SRB": 0.50, "CMX": 0.50}
-        }
+            }
+
+            self.interaction_pairs = [
+            ("CEV", "NEX"),
+            ("SRB", "CMX"),
+            ("SRB", "NTE"),
+            ("SRB", "SEV"),
+            ("CMX", "NEX")
+            ]
 
     def CalculateVci(
         self, 
-        normalized_domains, 
-        alpha_k=1/6, 
-        gamma=0.10, 
-        interaction_sum=1.35, 
-        centering_const=0.50
+        normalized_domains = None, 
+        alpha = 1/6, 
+        gamma = 0.10, 
+        centering_const = 0.50, 
+        scale_factor = 2.0
     ):
         # Equation 13
-        # 1. Weighted sum of domains
-        weighted_sum = alpha_k * sum(normalized_domains.values())
-        
-        # 2. Interaction sum
+        if normalized_domains is None:
+            # Illustrative normalized V_k_tilde inputs matching Equation 13
+            normalized_domains = {
+                "NEX": 0.555,
+                "SEV": 0.600,
+                "NTE": 0.309,
+                "CMX": 0.382,
+                "CEV": 0.508,
+                "SRB": 0.529
+            }
+
+        # 1. Main Term (Equal weights alpha = 1/6)
+        main_term = alpha * sum(normalized_domains.values())
+
+        # 2. Interaction Term (5 pairs, gamma = 0.10)
+        interaction_sum = sum(
+            normalized_domains[p1] * normalized_domains[p2]
+            for p1, p2 in self.interaction_pairs
+        )
         interaction_term = gamma * interaction_sum
-        
+
         # 3. Raw VCI
-        vci_raw = weighted_sum + interaction_term
-        
-        # 4. Centering to [-1, +1] manuscript scale
-        vci_centered = (vci_raw - centering_const) * 2.0
-        
-        return vci_raw, vci_centered
+        vci_raw = main_term + interaction_term
+
+        # 4. Centering to manuscript scale
+        vci_final = (vci_raw - centering_const) * scale_factor
+
+        return {
+            "main_term": main_term,
+            "interaction_term": interaction_term,
+            "vci_raw": vci_raw,
+            "vci_final": vci_final
+        }
 
     def AllocateSharedInput(self, raw_value, lambda_weights):
         # Equation 14

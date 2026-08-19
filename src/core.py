@@ -109,13 +109,11 @@ class VciCalculator:
         )
 
         #Calculate VCI (Raw and Centered)
-        vci_raw, vci_centered_raw = self.IntegrationResilience.CalculateVci(
-            normalized_domains=normalized_domains,
-            alpha_k=1/6,
-            gamma=0.10,
-            interaction_sum=1.35,
-            centering_const=0.50
-        )
+        vci_results = self.IntegrationResilience.CalculateVci(
+            normalized_domains = normalized_domains)
+
+        vci_raw = vci_results["vci_raw"]
+        vci_centered_raw = vci_results["vci_final"]
 
         # Step 7: Calculate UPRI
         sum_p = 2.10
