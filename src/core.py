@@ -88,31 +88,19 @@ class VciCalculator:
                     adverse_list=h_components
                 )
         
-        # Step 5
-        # Sign Orientation
-        nex_oriented = self.process.ApplyOrientation(nex_raw, is_cmx=False)
-        nte_oriented = self.process.ApplyOrientation(nte_raw, is_cmx=False)
-        sev_oriented = self.process.ApplyOrientation(sev_raw, is_cmx=False)
-        cmx_oriented = self.process.ApplyOrientation(cmx_raw, is_cmx=True)
-        cev_oriented = self.process.ApplyOrientation(cev_raw, is_cmx=False)
-        srb_oriented = self.process.ApplyOrientation(srb_raw, is_cmx=False)
-
-        # Normalization on [0, 1] using fixed bounds (alpha = -2, beta = +2)
-        nex_norm_raw = self.process.NormalizeVitalSign(nex_oriented, alpha=-2.0, beta=2.0)
-        nte_norm_raw = self.process.NormalizeVitalSign(nte_oriented, alpha=-2.0, beta=2.0)
-        sev_norm_raw = self.process.NormalizeVitalSign(sev_oriented, alpha=-2.0, beta=2.0)
-        cmx_norm_raw = self.process.NormalizeVitalSign(cmx_oriented, alpha=-2.0, beta=2.0)
-        cev_norm_raw = self.process.NormalizeVitalSign(cev_oriented, alpha=-2.0, beta=2.0)
-        srb_norm_raw = self.process.NormalizeVitalSign(srb_oriented, alpha=-2.0, beta=2.0)
-
-        # Step 6
+        # Steps 5 & 6 in a single comprehension pass
+        raw_domains = {
+            "NEX": nex_raw, "SEV": sev_raw, "NTE": nte_raw,
+            "CMX": cmx_raw, "CEV": cev_raw, "SRB": srb_raw
+        }
+        
         normalized_domains = {
-            "NEX": nex_norm_raw,
-            "SEV": sev_norm_raw,
-            "NTE": nte_norm_raw,
-            "CMX": cmx_norm_raw,
-            "CEV": cev_norm_raw,
-            "SRB": srb_norm_raw,
+            name: self.process.NormalizeVitalSign(
+                self.process.ApplyOrientation(val, is_cmx=(name == "CMX")),
+                alpha=-2.0,
+                beta=2.0
+            )
+            for name, val in raw_domains.items()
         }
 
         #Calculate VCI (Raw and Centered)
