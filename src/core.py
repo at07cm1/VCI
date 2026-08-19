@@ -92,19 +92,27 @@ class VciCalculator:
         # Sign Orientation
         nex_oriented = self.process.ApplyOrientation(nex_raw, is_cmx=False)
         nte_oriented = self.process.ApplyOrientation(nte_raw, is_cmx=False)
+        sev_oriented = self.process.ApplyOrientation(sev_raw, is_cmx=False)
+        cmx_oriented = self.process.ApplyOrientation(cmx_raw, is_cmx=True)
+        cev_oriented = self.process.ApplyOrientation(cev_raw, is_cmx=False)
+        srb_oriented = self.process.ApplyOrientation(srb_raw, is_cmx=False)
 
         # Normalization on [0, 1] using fixed bounds (alpha = -2, beta = +2)
         nex_norm_raw = self.process.NormalizeVitalSign(nex_oriented, alpha=-2.0, beta=2.0)
         nte_norm_raw = self.process.NormalizeVitalSign(nte_oriented, alpha=-2.0, beta=2.0)
+        sev_norm_raw = self.process.NormalizeVitalSign(sev_oriented, alpha=-2.0, beta=2.0)
+        cmx_norm_raw = self.process.NormalizeVitalSign(cmx_oriented, alpha=-2.0, beta=2.0)
+        cev_norm_raw = self.process.NormalizeVitalSign(cev_oriented, alpha=-2.0, beta=2.0)
+        srb_norm_raw = self.process.NormalizeVitalSign(srb_oriented, alpha=-2.0, beta=2.0)
 
         # Step 6
         normalized_domains = {
-            "NEX": nex_norm_raw, # 0.56 (from Step 5)
-            "SEV": 0.60,         # Illustrative fixed value
-            "NTE": nte_norm_raw, # 0.31 (from Step 5)
-            "CMX": 0.38,         # Illustrative fixed value
-            "CEV": 0.52,         # Illustrative fixed value
-            "SRB": 0.49,         # Illustrative fixed value
+            "NEX": nex_norm_raw,
+            "SEV": sev_norm_raw,
+            "NTE": nte_norm_raw,
+            "CMX": cmx_norm_raw,
+            "CEV": cev_norm_raw,
+            "SRB": srb_norm_raw,
         }
 
         #Calculate VCI (Raw and Centered)
@@ -150,8 +158,8 @@ class VciCalculator:
         self.generateUI.eq_labels[12].config(text=f"Equation 12 (SRB):  {srb_raw:+.3f}")
 
         # Update Equation Labels 5 and 6 for Step 5 Orient and scale
-        self.generateUI.eq_labels[5].config(text=f"Eq 5 (NEX~): {nex_norm_raw:.2f}")
-        self.generateUI.eq_labels[6].config(text=f"Eq 6 (NTE~): {nte_norm_raw:.2f}")
+        self.generateUI.eq_labels[5].config(text=f"Equation 5, 6: NEX: {normalized_domains['NEX']:.3f} | SEV: {normalized_domains['SEV']:.3f} | NTE: {normalized_domains['NTE']:.3f}")
+        self.generateUI.eq_labels[6].config(text=f"Equation 5, 6: CMX: {normalized_domains['CMX']:.3f} | CEV: {normalized_domains['CEV']:.3f} | SRB: {normalized_domains['SRB']:.3f}")
 
         # Update Equation Labels 13 for Step 6 Integration
         self.generateUI.eq_labels[13].config(text=f"Equation 13 (VCI_raw): {vci_raw:.3f} | VCI_centered: {vci_centered_raw:.3f}")
