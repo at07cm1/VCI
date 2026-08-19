@@ -2,6 +2,11 @@
 class IntegrationResilience:
     def __init__(self, root):     
             self.root = root
+            self.default_allocations = {
+                "NDVI": {"NEX": 0.40, "SRB": 0.30, "CEV": 0.30},
+                "f_PM": {"CMX": 0.50, "SRB": 0.50},
+                "NoiseNight": {"SRB": 0.50, "CMX": 0.50}
+        }
 
     def CalculateVci(
         self, 
@@ -26,6 +31,17 @@ class IntegrationResilience:
         
         return vci_raw, vci_centered
 
+    def AllocateSharedInput(self, raw_value, lambda_weights):
+        # Equation 14
+        weight_sum = sum(lambda_weights.values())
+        if not abs(weight_sum - 1.0) < 1e-5:
+            raise ValueError(f"Allocation fractions must sum to 1.0 (got {weight_sum}).")
+
+        return {
+            domain: weight * raw_value 
+            for domain, weight in lambda_weights.items()
+        }
+    
     def CalculateUpri(self, sum_protective=2.10, sum_stressors=2.55):
         # Equation 15
         if sum_stressors == 0:

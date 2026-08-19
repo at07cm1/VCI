@@ -71,7 +71,7 @@ class UrbanVitalSigns:
         
         return linear_part - penalty
 
-    def calculate_srb(self, protective_list=None, adverse_list=None):
+    def CalculateSrb(self, protective_list=None, adverse_list=None):
         # Equation 12
         if protective_list is None:
             # Default illustrative protective values: greenness, walkability, social, dwell

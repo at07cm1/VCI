@@ -83,7 +83,7 @@ class VciCalculator:
         p_components = [z_scores["NDVI"], z_scores["Walkability"], 0.40, 0.33]
         h_components = [z_scores["f_PM"], z_scores["NoiseNight"], z_scores["f_H"]]
 
-        srb_raw = self.urbanVitalSigns.calculate_srb(
+        srb_raw = self.urbanVitalSigns.CalculateSrb(
                     protective_list=p_components, 
                     adverse_list=h_components
                 )
@@ -102,6 +102,11 @@ class VciCalculator:
             )
             for name, val in raw_domains.items()
         }
+
+        ndvi_allocations = self.IntegrationResilience.AllocateSharedInput(
+            raw_value = inputs.get("NDVI", 0.45), 
+            lambda_weights = self.IntegrationResilience.default_allocations["NDVI"]
+        )
 
         #Calculate VCI (Raw and Centered)
         vci_raw, vci_centered_raw = self.IntegrationResilience.CalculateVci(
@@ -149,8 +154,9 @@ class VciCalculator:
         self.generateUI.eq_labels[5].config(text=f"Equation 5, 6: NEX: {normalized_domains['NEX']:.3f} | SEV: {normalized_domains['SEV']:.3f} | NTE: {normalized_domains['NTE']:.3f}")
         self.generateUI.eq_labels[6].config(text=f"Equation 5, 6: CMX: {normalized_domains['CMX']:.3f} | CEV: {normalized_domains['CEV']:.3f} | SRB: {normalized_domains['SRB']:.3f}")
 
-        # Update Equation Labels 13 for Step 6 Integration
+        # Update Equation Labels 13 and 14 for Step 6 Integration
         self.generateUI.eq_labels[13].config(text=f"Equation 13 (VCI_raw): {vci_raw:.3f} | VCI_centered: {vci_centered_raw:.3f}")
+        self.generateUI.eq_labels[14].config(text=f"Equation 14 (NDVI Allocations): NEX: {ndvi_allocations['NEX']:.3f} | SRB: {ndvi_allocations['SRB']:.3f} | CEV: {ndvi_allocations['CEV']:.3f}")
 
         # Update Equation Labels 15 for Step 7 UPRI Calculation
         self.generateUI.eq_labels[15].config(text=f"Eq 15 (UPRI): {upri_raw:.2f}")
