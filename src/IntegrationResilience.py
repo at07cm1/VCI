@@ -16,6 +16,15 @@ class IntegrationResilience:
             ("CMX", "NEX")
             ]
 
+            self.upri_defaults = {
+            "Social interaction": 0.25,
+            "Perceived safety": 0.35,
+            "Inactivity": 0.30,
+            "Commute": 0.20,
+            "Housing burden": 0.25,
+            "Crowding": 0.02
+            }
+
     def CalculateVci(
         self, 
         normalized_domains = None, 
@@ -70,9 +79,32 @@ class IntegrationResilience:
             for domain, weight in lambda_weights.items()
         }
     
-    def CalculateUpri(self, sum_protective=2.10, sum_stressors=2.55):
+    def CalculateUpri(self, z_scores = None):
         # Equation 15
-        if sum_stressors == 0:
+        if z_scores is None:
+        # Fallback to illustrative specification Z-scores
+            protective_list = [0.42, 1.20, 0.40, 0.33]  # sum = 2.35
+            adverse_list = [0.46, 0.83, 0.58, 0.99]      # sum = 2.86
+        else:
+            # Map protective Z-scores from Step 3
+            protective_list = [
+                z_scores.get("NDVI", 0.42),
+                z_scores.get("Walkability", 1.20),
+                0.40,  # Social
+                0.33   # Dwell
+            ]
+            # Map adverse Z-scores from Step 3
+            adverse_list = [
+                z_scores.get("f_PM", 0.46),
+                z_scores.get("NoiseNight", 0.83),
+                z_scores.get("f_H", 0.58),
+                z_scores.get("f_NH", 0.99)
+            ]
+
+        sum_p = sum(protective_list)
+        sum_h = sum(abs(v) for v in adverse_list)
+
+        if sum_h == 0:
             raise ValueError("Stressor sum cannot be zero.")
-            
-        return sum_protective / abs(sum_stressors)
+
+        return sum_p / sum_h

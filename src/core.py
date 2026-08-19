@@ -116,10 +116,7 @@ class VciCalculator:
         vci_centered_raw = vci_results["vci_final"]
 
         # Step 7: Calculate UPRI
-        sum_p = 2.10
-        sum_h = 2.55
-
-        upri_raw = self.IntegrationResilience.CalculateUpri(sum_protective=sum_p, sum_stressors=sum_h)
+        upri_raw = self.IntegrationResilience.CalculateUpri(z_scores=z_scores)
 
         self.generateUI.AddEquationLabels()
         
@@ -157,4 +154,4 @@ class VciCalculator:
         self.generateUI.eq_labels[14].config(text=f"Equation 14 (NDVI Allocations): NEX: {ndvi_allocations['NEX']:.3f} | SRB: {ndvi_allocations['SRB']:.3f} | CEV: {ndvi_allocations['CEV']:.3f}")
 
         # Update Equation Labels 15 for Step 7 UPRI Calculation
-        self.generateUI.eq_labels[15].config(text=f"Eq 15 (UPRI): {upri_raw:.2f}")
+        self.generateUI.eq_labels[15].config(text=f"Eq 15 (UPRI): {upri_raw:.3f}")
