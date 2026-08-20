@@ -22,7 +22,9 @@ class IntegrationResilience:
             "Inactivity": 0.30,
             "Commute": 0.20,
             "Housing burden": 0.25,
-            "Crowding": 0.02
+            "Crowding": 0.02,
+            "P": 3.25,
+            "H": 2.17
             }
 
     def CalculateVci(
@@ -79,32 +81,42 @@ class IntegrationResilience:
             for domain, weight in lambda_weights.items()
         }
     
-    def CalculateUpri(self, z_scores = None):
+    def CalculateUpri(self, inputs = None):
         # Equation 15
-        if z_scores is None:
-        # Fallback to illustrative specification Z-scores
-            protective_list = [0.42, 1.20, 0.40, 0.33]  # sum = 2.35
-            adverse_list = [0.46, 0.83, 0.58, 0.99]      # sum = 2.86
-        else:
-            # Map protective Z-scores from Step 3
-            protective_list = [
-                z_scores.get("NDVI", 0.42),
-                z_scores.get("Walkability", 1.20),
-                0.40,  # Social
-                0.33   # Dwell
-            ]
-            # Map adverse Z-scores from Step 3
-            adverse_list = [
-                z_scores.get("f_PM", 0.46),
-                z_scores.get("NoiseNight", 0.83),
-                z_scores.get("f_H", 0.58),
-                z_scores.get("f_NH", 0.99)
-            ]
+        if inputs is None:
+            inputs = {}
 
-        sum_p = sum(protective_list)
-        sum_h = sum(abs(v) for v in adverse_list)
+        # --- Protective Inputs (P) ---
+        p_dict = {
+            "NDVI"              : inputs.get("NDVI", 0.45),
+            "GVI"               : inputs.get("GVI", 0.30),
+            "Tree canopy"       : inputs.get("Canopy", 0.25),
+            "Green access"      : inputs.get("AccessGreen", 0.60),
+            # Scale walkability from 0-100 to 0.0-1.0
+            "Walkability"       : inputs.get("Walkability", 78.0) / 100.0,
+            "Daytime light"     : inputs.get("DaytimeLight", 0.30),
+            "Social interaction": self.upri_defaults["Social interaction"],
+            "Perceived safety"  : self.upri_defaults["Perceived safety"],
+            "P"                 : self.upri_defaults["P"]
+        }
+
+        # --- Stressor Inputs (H) ---
+        h_dict = {
+            "PM2.5"         : inputs.get("f_PM", 10.0) / 100.0 if inputs.get("f_PM", 10.0) > 1.0 else inputs.get("f_PM", 0.45),
+            "Night noise"   : inputs.get("NoiseNight", 55.0) / 100.0 if inputs.get("NoiseNight", 55.0) > 1.0 else inputs.get("NoiseNight", 0.40),
+            "Daytime heat"  : inputs.get("f_H", 33.0) / 100.0 if inputs.get("f_H", 33.0) > 1.0 else inputs.get("f_H", 0.30),
+            "Night heat"    : inputs.get("f_NH", 26.0) / 100.0 if inputs.get("f_NH", 26.0) > 1.0 else inputs.get("f_NH", 0.25),
+            "Inactivity"    : self.upri_defaults["Inactivity"],
+            "Commute"       : self.upri_defaults["Commute"],
+            "Housing burden": self.upri_defaults["Housing burden"],
+            "Crowding"      : self.upri_defaults["Crowding"],
+            "H"             : self.upri_defaults["H"]    
+        }
+
+        sum_p = sum(p_dict.values())
+        sum_h = sum(abs(v) for v in h_dict.values())
 
         if sum_h == 0:
             raise ValueError("Stressor sum cannot be zero.")
-
+        
         return sum_p / sum_h

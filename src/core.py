@@ -116,7 +116,7 @@ class VciCalculator:
         vci_centered_raw = vci_results["vci_final"]
 
         # Step 7: Calculate UPRI
-        upri_raw = self.IntegrationResilience.CalculateUpri(z_scores=z_scores)
+        upri_raw = self.IntegrationResilience.CalculateUpri(inputs = inputs)
 
         self.generateUI.AddEquationLabels()
         
