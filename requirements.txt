@@ -1,1 +1,2 @@
+# The project uses only Python standard-library modules.
 Python>=3.8
