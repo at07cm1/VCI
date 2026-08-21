@@ -92,9 +92,8 @@ class IntegrationResilience:
             "GVI"               : inputs.get("GVI", 0.30),
             "Tree canopy"       : inputs.get("Canopy", 0.25),
             "Green access"      : inputs.get("AccessGreen", 0.60),
-            # Scale walkability from 0-100 to 0.0-1.0
             "Walkability"       : inputs.get("Walkability", 78.0) / 100.0,
-            "Daytime light"     : inputs.get("DaytimeLight", 0.30),
+            "Daytime light"     : inputs.get("DaytimeLight", 0.15),
             "Social interaction": self.upri_defaults["Social interaction"],
             "Perceived safety"  : self.upri_defaults["Perceived safety"],
             "P"                 : self.upri_defaults["P"]
@@ -102,15 +101,15 @@ class IntegrationResilience:
 
         # --- Stressor Inputs (H) ---
         h_dict = {
-            "PM2.5"         : inputs.get("f_PM", 10.0) / 100.0 if inputs.get("f_PM", 10.0) > 1.0 else inputs.get("f_PM", 0.45),
-            "Night noise"   : inputs.get("NoiseNight", 55.0) / 100.0 if inputs.get("NoiseNight", 55.0) > 1.0 else inputs.get("NoiseNight", 0.40),
-            "Daytime heat"  : inputs.get("f_H", 33.0) / 100.0 if inputs.get("f_H", 33.0) > 1.0 else inputs.get("f_H", 0.30),
-            "Night heat"    : inputs.get("f_NH", 26.0) / 100.0 if inputs.get("f_NH", 26.0) > 1.0 else inputs.get("f_NH", 0.25),
-            "Inactivity"    : self.upri_defaults["Inactivity"],
-            "Commute"       : self.upri_defaults["Commute"],
-            "Housing burden": self.upri_defaults["Housing burden"],
-            "Crowding"      : self.upri_defaults["Crowding"],
-            "H"             : self.upri_defaults["H"]    
+            "PM2.5"          : inputs.get("f_PM", 10.0) / 100.0 if inputs.get("f_PM", 10.0) > 1.0 else inputs.get("f_PM", 0.45),
+            "Night noise"    : inputs.get("NoiseNight", 55.0) / 100.0 if inputs.get("NoiseNight", 55.0) > 1.0 else inputs.get("NoiseNight", 0.40),
+            "Daytime heat"   : inputs.get("f_H", 33.0) / 100.0 if inputs.get("f_H", 33.0) > 1.0 else inputs.get("f_H", 0.30),
+            "Night heat"     : inputs.get("f_NH", 26.0) / 100.0 if inputs.get("f_NH", 26.0) > 1.0 else inputs.get("f_NH", 0.25),
+            "Inactivity"     : self.upri_defaults["Inactivity"],
+            "Commute"        : self.upri_defaults["Commute"],
+            "Housing burden" : self.upri_defaults["Housing burden"],
+            "Crowding"       : self.upri_defaults["Crowding"],
+            "H"              : self.upri_defaults["H"]    
         }
 
         sum_p = sum(p_dict.values())

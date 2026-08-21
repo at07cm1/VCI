@@ -58,19 +58,28 @@ class VciCalculator:
         }
 
         # 4. Step 3 Standardisation (Calculate Z-scores)
+       
+
+        raw_values = {
+        "f_PM"        : self.f_pm,
+        "f_H"         : self.f_h,
+        "f_NH"        : self.f_nh,
+        "NDVI"        : ndvi_val,
+        "GVI"         : gvi_val,
+        "AccessGreen" : access_green,
+        "Canopy"      : canopy_val,
+        "Blue"        : blue_val,
+        "Micro"       : micro_val,
+        "Sidewalk"    : sidewalk_val,
+        "Walkability" : walkability_val,
+        "NoiseNight"  : night_noise_val,
+        }
+
+        # Standardise all variables dynamically
         z_scores = {
-            "f_PM":        self.process.Calculate_ZScore(self.f_pm, *anchors["f_PM"]),
-            "f_H":         self.process.Calculate_ZScore(self.f_h, *anchors["f_H"]),
-            "f_NH":        self.process.Calculate_ZScore(self.f_nh, *anchors["f_NH"]),
-            "NDVI":        self.process.Calculate_ZScore(ndvi_val, *anchors["NDVI"]),
-            "GVI":         self.process.Calculate_ZScore(gvi_val, *anchors["GVI"]),
-            "AccessGreen": self.process.Calculate_ZScore(access_green, *anchors["AccessGreen"]),
-            "Canopy":      self.process.Calculate_ZScore(canopy_val, *anchors["Canopy"]),
-            "Blue":        self.process.Calculate_ZScore(blue_val, *anchors["Blue"]),
-            "Micro":       self.process.Calculate_ZScore(micro_val, *anchors["Micro"]),
-            "Sidewalk":    self.process.Calculate_ZScore(sidewalk_val, *anchors["Sidewalk"]),
-            "Walkability": self.process.Calculate_ZScore(walkability_val, *anchors["Walkability"]),
-            "NoiseNight":  self.process.Calculate_ZScore(night_noise_val, *anchors["NoiseNight"]),
+            key: self.process.Calculate_ZScore(val, *anchors[key])
+            for key, val in raw_values.items()
+            if key in anchors
         }
 
         # Equations 7 - 12 Calculations        
@@ -84,8 +93,8 @@ class VciCalculator:
         h_components = [z_scores["f_PM"], z_scores["NoiseNight"], z_scores["f_H"]]
 
         srb_raw = self.urbanVitalSigns.CalculateSrb(
-                    protective_list=p_components, 
-                    adverse_list=h_components
+                    protective_list = p_components, 
+                    adverse_list = h_components
                 )
         
         # Steps 5 & 6 in a single comprehension pass
