@@ -58,22 +58,20 @@ class VciCalculator:
         }
 
         # 4. Step 3 Standardisation (Calculate Z-scores)
-       
-
         raw_values = {
-        "f_PM"        : self.f_pm,
-        "f_H"         : self.f_h,
-        "f_NH"        : self.f_nh,
-        "NDVI"        : ndvi_val,
-        "GVI"         : gvi_val,
-        "AccessGreen" : access_green,
-        "Canopy"      : canopy_val,
-        "Blue"        : blue_val,
-        "Micro"       : micro_val,
-        "Sidewalk"    : sidewalk_val,
-        "Walkability" : walkability_val,
-        "NoiseNight"  : night_noise_val,
-        }
+            "f_PM"        : self.f_pm,
+            "f_H"         : self.f_h,
+            "f_NH"        : self.f_nh,
+            "NDVI"        : ndvi_val,
+            "GVI"         : gvi_val,
+            "AccessGreen" : access_green,
+            "Canopy"      : canopy_val,
+            "Blue"        : blue_val,
+            "Micro"       : micro_val,
+            "Sidewalk"    : sidewalk_val,
+            "Walkability" : walkability_val,
+            "NoiseNight"  : night_noise_val,
+            }
 
         # Standardise all variables dynamically
         z_scores = {
@@ -167,6 +165,4 @@ class VciCalculator:
         self.generateUI.eq_labels[15].config(text=f"Eq 15 (UPRI): {upri_raw:.3f}")
 
         # Update Classification Label
-        self.generateUI.eq_labels[16].config(
-            text=f"City State Classification: {state_enum.value.upper()}"
-        )
+        self.generateUI.eq_labels[16].config(text=f"City State Classification: {state_enum.value.upper()}")
