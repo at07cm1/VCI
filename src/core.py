@@ -126,6 +126,7 @@ class VciCalculator:
 
         # Step 7: Calculate UPRI
         upri_raw = self.IntegrationResilience.CalculateUpri(inputs = inputs)
+        state_enum = self.IntegrationResilience.ResultClassification(vci = vci_centered_raw, upri = upri_raw)
 
         self.generateUI.AddEquationLabels()
         
@@ -164,3 +165,8 @@ class VciCalculator:
 
         # Update Equation Labels 15 for Step 7 UPRI Calculation
         self.generateUI.eq_labels[15].config(text=f"Eq 15 (UPRI): {upri_raw:.3f}")
+
+        # Update Classification Label
+        self.generateUI.eq_labels[16].config(
+            text=f"City State Classification: {state_enum.value.upper()}"
+        )

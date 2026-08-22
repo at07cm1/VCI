@@ -1,3 +1,10 @@
+from enum import Enum
+
+class CityState(Enum):
+    VITAL    = "Vital"
+    STRESSED = "Stressed"
+    FRAGILE  = "Fragile"
+    CRITICAL = "Critical"
 
 class IntegrationResilience:
     def __init__(self, root):     
@@ -119,3 +126,27 @@ class IntegrationResilience:
             raise ValueError("Stressor sum cannot be zero.")
         
         return sum_p / sum_h
+
+    def ResultClassification(self, vci, upri):
+        """
+        Classifies urban state using VCI and UPRI score thresholds.
+        Returns a CityState Enum instance.
+        """
+        if vci > 0 and upri > 1.5:
+            return CityState.VITAL
+        elif vci >= 0 and (1.0 < upri <= 1.5):
+            return CityState.STRESSED
+        elif vci < 0 and (0.5 < upri <= 1.0):
+            return CityState.FRAGILE
+        elif vci < 0 and upri <= 0.5:
+            return CityState.CRITICAL
+        else:
+            # Boundary fallback checks
+            if upri > 1.5:
+                return CityState.VITAL
+            elif upri > 1.0:
+                return CityState.STRESSED
+            elif upri > 0.5:
+                return CityState.FRAGILE
+            else:
+                return CityState.CRITICAL

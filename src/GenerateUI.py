@@ -163,7 +163,19 @@ class GenerateUI:
                 font=("Arial", 10),
                 anchor="w"
             )
-            lbl.place(x=(self.xLeft + 800), y=(start_y + (i - 1) * 40))
+            lbl.place(x=(self.xLeft + 800), y = (start_y + (i - 1) * 40))
             
             # Save reference by equation number
             self.eq_labels[i] = lbl
+
+        lbl = tk.Label(
+            self.root, 
+            text="Classification: --", 
+            font=("Arial", 10, "bold", "underline"),
+            fg="blue",
+            anchor="w"
+        )
+        lbl.place(x=(self.xLeft + 800), y= (start_y + len(self.eq_labels) * 40))
+        
+        # Save reference by equation number
+        self.eq_labels[16] = lbl
