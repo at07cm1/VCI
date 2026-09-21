@@ -93,30 +93,31 @@ class IntegrationResilience:
         if inputs is None:
             inputs = {}
 
-        # --- Protective Inputs (P) ---
+        # Protective inputs (P): keep raw values and avoid the percent-scaling
+        # adjustments that were introduced in the recent change.
         p_dict = {
-            "NDVI"              : inputs.get("NDVI", 0.45),
-            "GVI"               : inputs.get("GVI", 0.30),
-            "Tree canopy"       : inputs.get("Canopy", 0.25),
-            "Green access"      : inputs.get("AccessGreen", 0.60),
-            "Walkability"       : inputs.get("Walkability", 78.0) / 100.0,
-            "Daytime light"     : inputs.get("DaytimeLight", 0.15),
+            "NDVI": inputs.get("NDVI", 0.45),
+            "GVI": inputs.get("GVI", 0.30),
+            "Tree canopy": inputs.get("Canopy", 0.25),
+            "Green access": inputs.get("AccessGreen", 0.60),
+            "Walkability": inputs.get("Walkability", 78.0),
+            "Daytime light": inputs.get("DaytimeLight", 0.15),
             "Social interaction": self.upri_defaults["Social interaction"],
-            "Perceived safety"  : self.upri_defaults["Perceived safety"],
-            "P"                 : self.upri_defaults["P"]
+            "Perceived safety": self.upri_defaults["Perceived safety"],
+            "P": self.upri_defaults["P"]
         }
 
-        # --- Stressor Inputs (H) ---
+        # Stressor inputs (H): keep the direct value scale from the original model.
         h_dict = {
-            "PM2.5"          : inputs.get("f_PM", 10.0) / 100.0 if inputs.get("f_PM", 10.0) > 1.0 else inputs.get("f_PM", 0.45),
-            "Night noise"    : inputs.get("NoiseNight", 55.0) / 100.0 if inputs.get("NoiseNight", 55.0) > 1.0 else inputs.get("NoiseNight", 0.40),
-            "Daytime heat"   : inputs.get("f_H", 33.0) / 100.0 if inputs.get("f_H", 33.0) > 1.0 else inputs.get("f_H", 0.30),
-            "Night heat"     : inputs.get("f_NH", 26.0) / 100.0 if inputs.get("f_NH", 26.0) > 1.0 else inputs.get("f_NH", 0.25),
-            "Inactivity"     : self.upri_defaults["Inactivity"],
-            "Commute"        : self.upri_defaults["Commute"],
-            "Housing burden" : self.upri_defaults["Housing burden"],
-            "Crowding"       : self.upri_defaults["Crowding"],
-            "H"              : self.upri_defaults["H"]    
+            "PM2.5": inputs.get("PM2.5", 25.0),
+            "Night noise": inputs.get("NoiseNight", 55.0),
+            "Daytime heat": inputs.get("T_day", 33.0),
+            "Night heat": inputs.get("T_night", 26.0),
+            "Inactivity": self.upri_defaults["Inactivity"],
+            "Commute": self.upri_defaults["Commute"],
+            "Housing burden": self.upri_defaults["Housing burden"],
+            "Crowding": self.upri_defaults["Crowding"],
+            "H": self.upri_defaults["H"]
         }
 
         sum_p = sum(p_dict.values())
@@ -124,7 +125,7 @@ class IntegrationResilience:
 
         if sum_h == 0:
             raise ValueError("Stressor sum cannot be zero.")
-        
+
         return sum_p / sum_h
 
     def ResultClassification(self, vci, upri):
@@ -132,21 +133,11 @@ class IntegrationResilience:
         Classifies urban state using VCI and UPRI score thresholds.
         Returns a CityState Enum instance.
         """
-        if vci > 0 and upri > 1.5:
+        if vci >= 0 and upri >= 1.0:
             return CityState.VITAL
-        elif vci >= 0 and (1.0 < upri <= 1.5):
+        elif vci >= 0:
             return CityState.STRESSED
-        elif vci < 0 and (0.5 < upri <= 1.0):
+        elif upri >= 0.5:
             return CityState.FRAGILE
-        elif vci < 0 and upri <= 0.5:
-            return CityState.CRITICAL
         else:
-            # Boundary fallback checks
-            if upri > 1.5:
-                return CityState.VITAL
-            elif upri > 1.0:
-                return CityState.STRESSED
-            elif upri > 0.5:
-                return CityState.FRAGILE
-            else:
-                return CityState.CRITICAL
+            return CityState.CRITICAL
