@@ -354,8 +354,8 @@ class GenerateUI:
         self.exit_btn.place(relx=1.0, rely=1.0, x=-10, y=-10, anchor="se")
 
     def AddDataSelectionControls(self):
-        city_row_y = self.yTop + 220
-        neighborhood_row_y = city_row_y + 40
+        city_row_y = self.yTop + 200
+        neighborhood_row_y = city_row_y + 35
 
         self.data_city_label = tk.Label(self.root, text="City:", font=("Arial", 9, "bold"))
         self.data_city_label.place(x=self.xLeft, y=city_row_y)
@@ -368,7 +368,7 @@ class GenerateUI:
             width=25,
             values=city_values,
         )
-        self.city_dropdown.place(x=self.xLeft + 60, y=city_row_y - 4)
+        self.city_dropdown.place(x=self.xLeft + 90, y=city_row_y - 2)
         self.city_dropdown.bind("<<ComboboxSelected>>", self.OnCitySelected)
 
         self.data_neighborhood_label = tk.Label(self.root, text="Neighborhood:", font=("Arial", 9, "bold"))
@@ -380,7 +380,7 @@ class GenerateUI:
             state="readonly",
             width=25,
         )
-        self.neighborhood_dropdown.place(x=self.xLeft + 120, y=neighborhood_row_y - 4)
+        self.neighborhood_dropdown.place(x=self.xLeft + 90, y=neighborhood_row_y - 2)
         self.neighborhood_dropdown.place_forget()
         self.data_neighborhood_label.place_forget()
 
@@ -397,13 +397,13 @@ class GenerateUI:
             padx=10,
             pady=5,
         )
-        self.load_values_btn.place(x=self.xLeft + 60, y=neighborhood_row_y + 35)
+        self.load_values_btn.place(x=self.xLeft + 90, y=neighborhood_row_y + 35)
 
     def OnCitySelected(self, event=None):
         if not self.city_dropdown or not self.neighborhood_dropdown:
             return
-        selection_y = self.yTop + 220
-        neighborhood_y = selection_y + 40
+        selection_y = self.yTop + 200
+        neighborhood_y = selection_y + 35
         selected_city = self.city_var.get()
         neighborhoods = self.city_map.get(selected_city, [])
         if not neighborhoods:
@@ -416,7 +416,7 @@ class GenerateUI:
 
         self.neighborhood_dropdown.config(values=neighborhoods)
         self.neighborhood_dropdown.set(neighborhoods[0])
-        self.neighborhood_dropdown.place(x=self.xLeft + 120, y=neighborhood_y - 4)
+        self.neighborhood_dropdown.place(x=self.xLeft + 90, y=neighborhood_y - 2)
         self.data_neighborhood_label.place(x=self.xLeft, y=neighborhood_y)
 
     def OnLoadValuesClicked(self):
@@ -468,7 +468,7 @@ class GenerateUI:
 
     def AddInputFields(self):
         vcmd = (self.root.register(self.ValidateFloat), '%P')
-        start_y = self.yTop + (170 if self.data_available else 70)
+        start_y = self.yTop + 80
         row_height = 30
 
         for i, (key, (label_text, default_val)) in enumerate(self.DEFAULT_INPUT_CONFIG.items()):

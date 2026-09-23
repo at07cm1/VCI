@@ -109,15 +109,15 @@ class IntegrationResilience:
 
         # Stressor inputs (H): keep the direct value scale from the original model.
         h_dict = {
-            "PM2.5": inputs.get("PM2.5", 25.0),
-            "Night noise": inputs.get("NoiseNight", 55.0),
-            "Daytime heat": inputs.get("T_day", 33.0),
-            "Night heat": inputs.get("T_night", 26.0),
-            "Inactivity": self.upri_defaults["Inactivity"],
-            "Commute": self.upri_defaults["Commute"],
+            "PM2.5"         : inputs.get("PM2.5", 25.0),
+            "Night noise"   : inputs.get("NoiseNight", 55.0),
+            "Daytime heat"  : inputs.get("T_day", 33.0),
+            "Night heat"    : inputs.get("T_night", 26.0),
+            "Inactivity"    : self.upri_defaults["Inactivity"],
+            "Commute"       : self.upri_defaults["Commute"],
             "Housing burden": self.upri_defaults["Housing burden"],
-            "Crowding": self.upri_defaults["Crowding"],
-            "H": self.upri_defaults["H"]
+            "Crowding"      : self.upri_defaults["Crowding"],
+            "H"             : self.upri_defaults["H"]
         }
 
         sum_p = sum(p_dict.values())
@@ -133,11 +133,21 @@ class IntegrationResilience:
         Classifies urban state using VCI and UPRI score thresholds.
         Returns a CityState Enum instance.
         """
-        if vci >= 0 and upri >= 1.0:
+        if vci > 0 and upri > 1.5:
             return CityState.VITAL
-        elif vci >= 0:
+        elif vci >= 0 and (1.0 < upri <= 1.5):
             return CityState.STRESSED
-        elif upri >= 0.5:
+        elif vci < 0 and (0.5 < upri <= 1.0):
             return CityState.FRAGILE
-        else:
+        elif vci < 0 and upri <= 0.5:
             return CityState.CRITICAL
+        else:
+            # Boundary fallback checks
+            if upri > 1.5:
+                return CityState.VITAL
+            elif upri > 1.0:
+                return CityState.STRESSED
+            elif upri > 0.5:
+                return CityState.FRAGILE
+            else:
+                return CityState.CRITICAL
