@@ -344,7 +344,6 @@ class GenerateUI:
 
         if self.data_available:
             self.AddDataSelectionControls()
-            self.variable_label.place(x=(self.xLeft + 400), y=(self.yTop + 170))
         self.AddInputFields()
 
         self.exit_btn = tk.Button(
