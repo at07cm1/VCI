@@ -2,21 +2,24 @@
 
 ## Overview
 
-Urban design has conventionally been evaluated using criteria other than those directly 
-address human neurological and cardiovascular health. The Vital City Index (VCI) 
-conceptualizes cities as exposure systems acting on the brain–heart axis to fill the lack of 
-spatially explicit frameworks which systematically link urban morphology to 
-neurophysiological pathways and biological domains. The VCI conceptualizes six urban 
-vital signs, each defined by equations which map quantifiable spatial characteristics to 
-these pathways. Shared inputs are allocated across pathways using fractions derived from 
-meta-analytic effect sizes, and non-linear dose–response transformations and interaction 
-terms encode the brain–heart axis. The Urban Physiological Resilience Index (UPRI), 
-expressed as a protective-resource-to-stressor ratio, classifies neighborhoods into four 
-typologies. Application of the framework to 19 sites, identifies circadian disruption due to 
-nighttime heat as the primary driver of intercity variation. These results show a climate specific vulnerability that is not captured by conventional daytime-focused assessment 
-protocols.
+Urban design impacts neurological and cardiovascular diseases even though
+existing design frameworks neglect addressing this connection. 
+Here, we introduced the Vital City Index (VCI) which quantified in six urban vital signs, 
+the association of urban spatial characteristics with the neurophysiological pathways and biological domains, 
+acting on a brain-heart axis. A consistent estimation of synthetic spatial patterns
+encoding the brain-heart axis, is provided through fractions from meta-analytic effect 
+sizes for the shared inputs of the equations, non-linear dose-response transformations
+and interaction terms. The pilot application of the framework to 19 urban sites provides
+unique insights and opportunities for urban interventions aimed at healthier
+urban design protocols more human well-being based.
 
-Postdoctoral Fellowship Research: Dr. Maria Christofi
+
+Postdoctoral Fellow and Principal Researcher: Dr. Maria Christofi
+
+Team: Christofi Maria, Sheba Ross, Mike O’Neill, Augustin Ibanez, Timotheos Souroulla, 
+Upali Nanda, Burcin Ikiz, Mitchell S.V. Elkind, Harris A. Eyre
+
+Funded Research by Center for Advanced Design Research & Evaluation - CADRE 
 
 ## Prerequisites
 
