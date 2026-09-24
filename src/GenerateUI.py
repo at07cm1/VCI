@@ -7,6 +7,22 @@ from openpyxl import load_workbook
 
 
 class GenerateUI:
+    PERCENTAGE_INPUT_KEYS = {"GVI", "Canopy", "LightNight", "HumidNight"}
+
+    @staticmethod
+    def normalize_percentage_input(key, value):
+        if key not in GenerateUI.PERCENTAGE_INPUT_KEYS:
+            return float(value)
+
+        try:
+            numeric_value = float(value)
+        except (TypeError, ValueError):
+            return value
+
+        if abs(numeric_value) > 1.0:
+            return numeric_value / 100.0
+        return numeric_value
+
     DEFAULT_INPUT_CONFIG = {
         "PM2.5": ("PM2.5 (μg m⁻³)", "10.0"),
         "T_day": ("Daytime heat T (°C)", "33.0"),
@@ -436,7 +452,7 @@ class GenerateUI:
         for key, entry in self.input_entries.items():
             if key in values:
                 entry.delete(0, tk.END)
-                entry.insert(0, str(values[key]))
+                entry.insert(0, str(self.normalize_percentage_input(key, values[key])))
 
     def OnCalculateClicked(self):
         if self.vci_calculator:
@@ -483,7 +499,7 @@ class GenerateUI:
                 validatecommand=vcmd
             )
 
-            entry.insert(0, default_val)
+            entry.insert(0, str(self.normalize_percentage_input(key, default_val)))
             entry.place(x=self.xLeft + 590, y=current_y, width=70)
 
             self.input_entries[key] = entry

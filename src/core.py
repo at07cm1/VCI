@@ -20,7 +20,10 @@ class VciCalculator:
         self.urbanVitalSigns = UrbanVitalSigns(self.root)
         self.IntegrationResilience = IntegrationResilience(self.root)
         try:
-            inputs = {key: float(entry.get()) for key, entry in self.generateUI.input_entries.items()}
+            inputs = {
+                key: self.generateUI.normalize_percentage_input(key, float(entry.get()))
+                for key, entry in self.generateUI.input_entries.items()
+            }
 
             pm25_val        = inputs["PM2.5"]
             day_heat_val    = inputs["T_day"]
