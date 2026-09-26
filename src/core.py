@@ -24,6 +24,12 @@ class VciCalculator:
                 key: self.generateUI.normalize_percentage_input(key, float(entry.get()))
                 for key, entry in self.generateUI.input_entries.items()
             }
+            if getattr(self.generateUI, "current_site_code", None):
+                inputs["Site"] = self.generateUI.current_site_code
+            if self.generateUI.city_var.get():
+                inputs["City"] = self.generateUI.city_var.get().strip()
+            if self.generateUI.neighborhood_var.get():
+                inputs["Location"] = self.generateUI.neighborhood_var.get().strip()
 
             pm25_val        = inputs["PM2.5"]
             day_heat_val    = inputs["T_day"]

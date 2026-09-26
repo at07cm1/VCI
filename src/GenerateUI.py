@@ -7,7 +7,19 @@ from openpyxl import load_workbook
 
 
 class GenerateUI:
-    PERCENTAGE_INPUT_KEYS = {"GVI", "Canopy", "LightNight", "HumidNight"}
+    PERCENTAGE_INPUT_KEYS = {
+        "GVI",
+        "Canopy",
+        "LightNight",
+        "HumidNight",
+        "Walkability",
+        "Social interaction",
+        "Perceived safety",
+        "Inactivity",
+        "Commute",
+        "Housing burden",
+        "Crowding",
+    }
 
     @staticmethod
     def normalize_percentage_input(key, value):
@@ -34,7 +46,7 @@ class GenerateUI:
         "Blue": ("Blue-space proximity", "0.20"),
         "Micro": ("Restorative micro-space", "0.40"),
         "Sidewalk": ("Sidewalk contiguity", "0.70"),
-        "Walkability": ("Walkability (0–100)", "78.0"),
+        "Walkability": ("Walkability", "78.0"),
         "NoiseNight": ("Night noise dB(A)", "55.0"),
         "Daylight": ("Daytime light Z", "0.30"),
         "LightNight": ("Night light Z", "0.60"),
@@ -82,6 +94,7 @@ class GenerateUI:
             "nightmintempc": "T_night",
             "ndvi": "NDVI",
             "gvi": "GVI",
+            "gvipercent": "GVI",
             "accessgreen": "AccessGreen",
             "greenaccess": "AccessGreen",
             "greenaccess01": "AccessGreen",
@@ -95,8 +108,21 @@ class GenerateUI:
             "microsite": "Micro",
             "restorativemicrospace01": "Micro",
             "sidewalk": "Sidewalk",
-            "sidewalkcontiguity01": "Sidewalk",
+            "sidewalkcontiguity": "Walkability",
+            "sidewalkcontiguity01": "Walkability",
             "walkability": "Walkability",
+            "safety": "Perceived safety",
+            "perceivedsafety": "Perceived safety",
+            "socialinteraction": "Social interaction",
+            "socialinteraction0100": "Social interaction",
+            "inactivity": "Inactivity",
+            "inactivitypercent": "Inactivity",
+            "commute": "Commute",
+            "commutemin": "Commute",
+            "housingburden": "Housing burden",
+            "housingburdenpercent": "Housing burden",
+            "crowding": "Crowding",
+            "crowding01": "Crowding",
             "noisenight": "NoiseNight",
             "nightnoiselnightdb": "NoiseNight",
             "nightnoise": "NoiseNight",
@@ -308,6 +334,9 @@ class GenerateUI:
                         if not (is_site_match or is_city_match):
                             continue
 
+                        if site_idx is not None and row_site:
+                            values["Site"] = str(row_site).strip()
+
                         for index, cell_value in enumerate(row):
                             if index >= len(header):
                                 continue
@@ -345,6 +374,7 @@ class GenerateUI:
         self.city_dropdown = None
         self.neighborhood_dropdown = None
         self.load_values_btn = None
+        self.current_site_code = None
 
         self.calc_btn = tk.Button(root, text="Calculate VCI", command=lambda: self.OnCalculateClicked(),
                                     bg="#0D15ED", fg="white")
@@ -449,6 +479,7 @@ class GenerateUI:
             messagebox.showwarning("No data", f"No values found for {city} / {neighborhood}.")
             return
 
+        self.current_site_code = values.get("Site")
         for key, entry in self.input_entries.items():
             if key in values:
                 entry.delete(0, tk.END)
