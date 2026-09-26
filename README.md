@@ -85,6 +85,7 @@ VCI/
 ├── build/
 │   └── VitalCityIndex/
 ├── data/
+│   ├── Center point of the locations examined.xlsx
 │   ├── Tables nature raw inputs per city.xlsx
 │   ├── Tables nature raw inputs per equation.xlsx
 │   └── Tables nature- city names.xlsx

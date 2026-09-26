@@ -1,7 +1,13 @@
 import re
+from difflib import SequenceMatcher
 from pathlib import Path
 import tkinter as tk
 from tkinter import messagebox, ttk
+
+try:
+    import webview
+except ImportError:
+    webview = None
 
 from openpyxl import load_workbook
 
@@ -76,6 +82,45 @@ class GenerateUI:
         if value is None:
             return ""
         return re.sub(r"[^a-z0-9]+", "", str(value).strip().lower())
+
+    @staticmethod
+    def _normalize_name(value):
+        if value is None:
+            return ""
+        text = str(value).strip().lower()
+        text = re.sub(r"[^a-z0-9\s,]+", " ", text)
+        text = re.sub(r"\s+", " ", text)
+        return text.strip().replace(",", "")
+
+    @staticmethod
+    def _canonicalize_location_name(value):
+        text = GenerateUI._normalize_name(value)
+        replacements = {
+            "third wed": "third ward",
+            "world cogress": "world congress",
+            "georgia world cogress center": "georgia world congress center",
+        }
+        for old, new in replacements.items():
+            if old in text:
+                text = text.replace(old, new)
+        return text.strip()
+
+    @staticmethod
+    def _names_match(left, right, city=None):
+        left_text = GenerateUI._canonicalize_location_name(left)
+        right_text = GenerateUI._canonicalize_location_name(right)
+        if not left_text or not right_text:
+            return False
+        if city is not None:
+            city_text = GenerateUI._canonicalize_location_name(city)
+            if city_text and city_text in left_text:
+                left_text = left_text.replace(city_text, "").strip()
+            if city_text and city_text in right_text:
+                right_text = right_text.replace(city_text, "").strip()
+        if left_text == right_text or left_text in right_text or right_text in left_text:
+            return True
+        ratio = SequenceMatcher(None, left_text, right_text).ratio()
+        return ratio >= 0.9
 
     @staticmethod
     def _field_alias_map():
@@ -206,6 +251,89 @@ class GenerateUI:
                         yield row
         finally:
             workbook.close()
+
+    @staticmethod
+    def load_location_coordinates(data_dir=None, city=None, neighborhood=None):
+        data_dir = GenerateUI.get_data_directory(data_dir)
+        center_file = next((path for path in sorted(data_dir.iterdir()) if path.is_file() and "center" in path.name.lower() and path.suffix.lower() in {".xlsx", ".xls"}), None)
+        if center_file is None:
+            return None
+
+        workbook = load_workbook(center_file, read_only=True, data_only=True)
+        try:
+            for worksheet in workbook.worksheets:
+                rows = list(worksheet.iter_rows(values_only=True))
+                if not rows:
+                    continue
+
+                header_index = None
+                for idx, row in enumerate(rows):
+                    normalized = [GenerateUI._normalize_header(value) for value in row]
+                    if any("code" in cell for cell in normalized) and any("site" in cell for cell in normalized) and any("latitude" in cell for cell in normalized) and any("longitude" in cell for cell in normalized):
+                        header_index = idx
+                        break
+
+                if header_index is None:
+                    continue
+
+                header_map = {}
+                for idx, cell in enumerate(rows[header_index]):
+                    if cell is None:
+                        continue
+                    header_map[GenerateUI._normalize_header(cell)] = idx
+
+                lat_idx = header_map.get("latitude")
+                lon_idx = header_map.get("longitude")
+                site_idx = header_map.get("site")
+                code_idx = header_map.get("code")
+                if lat_idx is None or lon_idx is None:
+                    continue
+
+                for row in rows[header_index + 1:]:
+                    if len(row) <= max(lat_idx, lon_idx):
+                        continue
+
+                    site_value = row[site_idx] if site_idx is not None and len(row) > site_idx else None
+                    code_value = row[code_idx] if code_idx is not None and len(row) > code_idx else None
+                    site_label = str(site_value or code_value or "").strip()
+
+                    if city and neighborhood:
+                        row_candidates = [
+                            site_label,
+                            str(code_value or "").strip(),
+                            f"{site_label}, {city}",
+                            f"{city}, {site_label}",
+                            f"{site_label} {city}",
+                            f"{city} {site_label}",
+                        ]
+                        selected_variants = [
+                            neighborhood,
+                            f"{neighborhood}, {city}",
+                            f"{city}, {neighborhood}",
+                            f"{neighborhood} {city}",
+                        ]
+                        if any(
+                            GenerateUI._names_match(selected_name, row_candidate, city)
+                            for selected_name in selected_variants
+                            for row_candidate in row_candidates
+                            if row_candidate
+                        ):
+                            try:
+                                lat = float(row[lat_idx])
+                                lon = float(row[lon_idx])
+                                return {"latitude": lat, "longitude": lon, "site": site_label}
+                            except (TypeError, ValueError):
+                                continue
+
+                    if city is None and neighborhood is None and site_value is not None:
+                        try:
+                            return {"latitude": float(row[lat_idx]), "longitude": float(row[lon_idx]), "site": str(site_value).strip()}
+                        except (TypeError, ValueError):
+                            continue
+        finally:
+            workbook.close()
+
+        return None
 
     @staticmethod
     def load_city_names(data_dir=None):
@@ -444,6 +572,19 @@ class GenerateUI:
         )
         self.load_values_btn.place(x=self.xLeft + 90, y=neighborhood_row_y + 35)
 
+        self.map_btn = tk.Button(
+            self.root,
+            text="Show Map 📌",
+            command=self.OpenSelectedLocationMap,
+            bg="#EAF2FF",
+            fg="#0B3D91",
+            width=13,
+            height=1,
+            padx=4,
+            pady=2,
+        )
+        self.map_btn.place(x=self.xLeft + 270, y=neighborhood_row_y - 5)
+
     def OnCitySelected(self, event=None):
         if not self.city_dropdown or not self.neighborhood_dropdown:
             return
@@ -484,6 +625,45 @@ class GenerateUI:
             if key in values:
                 entry.delete(0, tk.END)
                 entry.insert(0, str(self.normalize_percentage_input(key, values[key])))
+
+    def OpenSelectedLocationMap(self):
+        city = self.city_var.get().strip()
+        neighborhood = self.neighborhood_var.get().strip()
+        if not city or not neighborhood:
+            messagebox.showwarning("Selection needed", "Please select a city and a neighborhood first.")
+            return
+
+        coords = self.load_location_coordinates(self.data_dir, city, neighborhood)
+        if coords is None:
+            messagebox.showwarning("No location", f"No exact coordinates were found for {neighborhood}, {city}.")
+            return
+
+        lat = coords["latitude"]
+        lon = coords["longitude"]
+        map_url = f"https://www.google.com/maps?q={lat},{lon}&z=15"
+
+        if webview is None:
+            messagebox.showwarning(
+                "Map unavailable",
+                "The embedded Google Maps view requires the pywebview package in the active Python environment."
+            )
+            return
+
+        try:
+            webview.create_window(
+                title=f"Map: {neighborhood}, {city}",
+                url=map_url,
+                width=1100,
+                height=760,
+                resizable=True,
+                background_color="#ffffff",
+            )
+            webview.start(gui="edgechromium")
+        except Exception:
+            messagebox.showwarning(
+                "Map unavailable",
+                "The embedded Google Maps window could not be opened. Please check the application window environment."
+            )
 
     def OnCalculateClicked(self):
         if self.vci_calculator:
