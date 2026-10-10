@@ -1,0 +1,33 @@
+Input,Definition,Source,Native unit,Resolution,Temporal ref.,Direction,Transform,Transform order,Evidence grade,Domain(s) [allocation λ],Missing-data rule
+NDVI,Normalized Difference Vegetation Index,Sentinel-2 L2A,index −1 to 1,10 m,growing-season mean,+,none,standardize,A,"NEX [0.40], SRB [0.30], CEV [0.30]",nearest-tract mean
+GVI,"Green View Index, street-level visible greenery",GSV semantic segmentation,%,point→tract,audit period,+,none,standardize,B,"NEX, CEV",virtual audit
+AccessGreen,Distance/accessibility to public green space,municipal GIS,m (inverted),tract,current,+,none,standardize,B,NEX,nearest-tract value
+Canopy,Tree-canopy cover,NLCD / municipal registry,%,30 m,latest,+,none,standardize,A,NEX,domain renormalization
+Blue,Proximity to water bodies,municipal GIS / OSM,m (inverted),tract,current,+,none,standardize,C,NEX,domain renormalization
+Micro,Restorative micro-space presence,virtual audit,count/index,segment,audit period,+,none,standardize,C,NEX,domain renormalization
+Sidewalk,Sidewalk continuity,OSM / municipal,% streets,tract,latest,+,none,standardize,B,NEX,nearest-tract value
+Safety,Perceived safety / inverse crime rate,police records,rate (inverted),tract,annual,+,none,standardize,B,SEV,nearest-tract value
+Interaction,Social-interaction intensity / activity density,audit / mobility,index,segment,audit period,+,none,standardize,C,SEV,virtual audit
+ServiceAccess,Access to essential services,municipal GIS / OSM,index,tract,current,+,none,standardize,B,SEV,nearest-tract value
+Density,Population/built density,ACS / Statistics Denmark,persons/km²,tract,5-yr,+*,none,standardize,B,SEV,nearest-tract value
+AmenityMix,Land-use / functional diversity,OSM / municipal,entropy index,tract,current,+,none,standardize,B,SEV,nearest-tract value
+Play,Play-space availability,municipal GIS,count/index,tract,current,+,none,standardize,C,SEV,domain renormalization
+Frontage,Active frontage,virtual audit,% / index,segment,audit period,+,none,standardize,C,SEV,virtual audit
+Daylight,Daytime light / circadian entrainment regime,Sky-view factor from DSM/ street imagery,dimensionless index (0�1),1m/ viewpoint,2020,+,Sky-view factor (SVF); site mean,standardize,B,NTE,nearest-tract value
+LightNight,Nighttime artificial light,VIIRS DNB,nW cm⁻² sr⁻¹,~500 m,annual,−,none,standardize,B,NTE,nearest-tract value
+NoiseNight,Nighttime environmental noise,strategic noise maps,dB(A),tract,latest,−,none,standardize,B,NTE,nearest-tract value
+f_NH(T),Nighttime heat (threshold-transformed),NOAA ISD / Landsat,°C,station→tract,summer nightly min,−,"f_NH: max(0, T−T_thr)^1.5",transform → standardize,C,NTE,nearest-monitor value
+HumidNight,Nighttime humidity / discomfort,NOAA / reanalysis,% / index,tract,summer nights,−,none,standardize,C,NTE,nearest-monitor value
+f_PM(x),Fine particulate matter (supralinear-transformed),EPA AQS / EEA,µg m⁻³,monitor→tract,annual,−,"f_PM: ln(x+1)/ln(x_ref+1), x_ref=5",transform → standardize,A,"CMX [0.65], SRB [0.35]",nearest-monitor value
+Noise,Environmental noise (daytime/24-h),strategic noise maps,dB(A),tract,latest,−,none,standardize,A,"SRB [0.70], CMX [0.30]",nearest-tract value
+f_H(T),Daytime heat (U-shaped from T_MMT),NOAA ISD / Landsat,°C,station→tract,summer daily,−,f_H: ((T−T_MMT)/s_T)²,transform → standardize,A,CMX,nearest-monitor value
+Inactivity,Physical inactivity prevalence,CDC PLACES,%,tract,latest,−,none,standardize,A,CMX,nearest-tract value
+Commute,Mean commute duration,ACS B08303,min,tract,5-yr,−,none,standardize,B,CMX,nearest-tract value
+Housing,Housing cost burden (chronic psychosocial),ACS B25070/B25091,% income,tract,5-yr,−,none,standardize,B,CMX,nearest-tract value
+Fractal,Streetscape fractal dimension,GSV / morphometrics,dimension 1–2,segment,audit period,+,none,standardize,C,CEV,virtual audit
+Soundscape,Natural soundscape proportion,audit / acoustic,%,tract,audit period,+,none,standardize,C,CEV,domain renormalization
+Legibility,Spatial legibility,morphometric analysis,index,tract,current,+,none,standardize,C,CEV,domain renormalization
+Clutter,Visual clutter,GSV segmentation,index,segment,audit period,−,none,standardize,C,CEV,virtual audit
+Culture,Cultural access,municipal GIS / OSM,count/index,tract,current,+,none,standardize,C (low-confidence),CEV,domain renormalization
+Novelty,Environmental novelty,audit / morphometrics,index,segment,audit period,+,none,standardize,C (low-confidence),CEV,domain renormalization
+C (complexity),Sensory complexity (inverted-U penalty vs C_opt),GSV / morphometrics,index,segment,audit period,∩,quadratic penalty −((C−C_opt)/s_C)²,transform in-equation,C,CEV,virtual audit
