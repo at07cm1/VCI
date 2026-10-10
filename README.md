@@ -75,26 +75,28 @@ This will launch the VCI Calculator GUI window. The application provides a graph
 
 ## Project Structure
 
-```
+```text
 VCI/
 ├── LICENSE
 ├── README.md
 ├── requirements.txt
 ├── run.py
 ├── VitalCityIndex.spec
-├── build/
-│   └── VitalCityIndex/
-├── data/
+├── data/                           # source datasets and lookup tables
 │   ├── Center point of the locations examined.xlsx
 │   ├── Tables nature raw inputs per city.xlsx
 │   ├── Tables nature raw inputs per equation.xlsx
 │   └── Tables nature- city names.xlsx
-└── src/
-    ├── Core.py
-    ├── GenerateUI.py
-    ├── IntegrationResilience.py
-    ├── SpecificationRules.py
-    └── UrbanVitalSigns.py
+├── dist/                           # packaged application artifacts
+├── Figures/                        # generated output figures
+├── src/                            # application source code
+│   ├── Core.py
+│   ├── GenerateUI.py
+│   ├── IntegrationResilience.py
+│   ├── SpecificationRules.py
+│   └── UrbanVitalSigns.py
+├── Supplementary Tables/           # supplemental tables and metadata
+
 ```
 
 ### Module Descriptions
