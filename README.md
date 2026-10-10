@@ -17,7 +17,7 @@ urban design protocols more human well-being based.
 Postdoctoral Fellow and Principal Researcher: Dr. Maria Christofi
 
 Team: Christofi Maria, Sheba Ross, Mike O’Neill, Augustin Ibanez, Timotheos Souroulla, 
-Upali Nanda, Burcin Ikiz, Mitchell S.V. Elkind, Harris A. Eyre
+Burcin Ikiz, Mitchell S.V. Elkind, Harris A. Eyre, Upali Nanda
 
 Funded Research by Center for Advanced Design Research & Evaluation - CADRE 
 
